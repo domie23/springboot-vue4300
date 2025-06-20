@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.KetishenqingDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.yonghu_id as yonghuId
+        ,a.ketixuanze_id as ketixuanzeId
+        ,a.ketishenqing_yesno_types as ketishenqingYesnoTypes
+        ,a.ketishenqing_yesno_text as ketishenqingYesnoText
+        ,a.ketishenqing_delete as ketishenqingDelete
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.KetishenqingView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+        ,ketixuanze.jiaoshi_id as ketixuanzeJiaoshiId
+        ,ketixuanze.ketixuanze_name as ketixuanzeName
+        ,ketixuanze.ketixuanze_types as ketixuanzeTypes
+        ,ketixuanze.laiyuan_types as laiyuanTypes
+        ,ketixuanze.zhuanye_types as zhuanyeTypes
+        ,ketixuanze.ketixuanze_yixuan as ketixuanzeYixuan
+        ,ketixuanze.ketixuanze_kexuan as ketixuanzeKexuan
+        ,ketixuanze.ketixuanze_content as ketixuanzeContent
+        ,ketixuanze.ketixuanze_yesno_types as ketixuanzeYesnoTypes
+        ,ketixuanze.ketixuanze_yesno_text as ketixuanzeYesnoText
+        ,ketixuanze.ketixuanze_delete as ketixuanzeDelete
+        ,yonghu.yonghu_name as yonghuName
+        ,yonghu.yonghu_photo as yonghuPhoto
+        ,yonghu.yonghu_phone as yonghuPhone
+        ,yonghu.zhuanye_types as zhuanyeTypes
+        ,yonghu.banji_types as banjiTypes
+        ,yonghu.yonghu_delete as yonghuDelete
+
+        FROM ketishenqing  a
+        left JOIN ketixuanze ketixuanze ON a.ketixuanze_id = ketixuanze.id
+        left JOIN yonghu yonghu ON a.yonghu_id = yonghu.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.yonghuId != null and params.yonghuId != ''">
+                and (
+                    a.yonghu_id = #{params.yonghuId}
+                )
+            </if>
+            <if test="params.ketixuanzeId != null and params.ketixuanzeId != ''">
+                and (
+                    a.ketixuanze_id = #{params.ketixuanzeId}
+                )
+            </if>
+            <if test="params.ketishenqingYesnoTypes != null and params.ketishenqingYesnoTypes != ''">
+                and a.ketishenqing_yesno_types = #{params.ketishenqingYesnoTypes}
+            </if>
+            <if test=" params.ketishenqingYesnoText != '' and params.ketishenqingYesnoText != null and params.ketishenqingYesnoText != 'null' ">
+                and a.ketishenqing_yesno_text like CONCAT('%',#{params.ketishenqingYesnoText},'%')
+            </if>
+            <if test="params.ketishenqingDeleteStart != null and params.ketishenqingDeleteStart != ''">
+                <![CDATA[  and a.ketishenqing_delete >= #{params.ketishenqingDeleteStart}   ]]>
+            </if>
+            <if test="params.ketishenqingDeleteEnd != null and params.ketishenqingDeleteEnd != ''">
+                <![CDATA[  and a.ketishenqing_delete <= #{params.ketishenqingDeleteEnd}   ]]>
+            </if>
+             <if test="params.ketishenqingDelete != null and params.ketishenqingDelete != ''">
+                and a.ketishenqing_delete = #{params.ketishenqingDelete}
+             </if>
+
+                <!-- 判断课题选择的id不为空 -->
+            <if test=" params.ketixuanzeIdNotNull != '' and params.ketixuanzeIdNotNull != null and params.ketixuanzeIdNotNull != 'null' ">
+                and a.ketixuanze_id IS NOT NULL
+            </if>
+            <if test="params.jiaoshiId != null  and params.jiaoshiId != ''">
+                and ketixuanze.jiaoshi_id = #{params.jiaoshiId}
+            </if>
+            <if test=" params.ketixuanzeName != '' and params.ketixuanzeName != null and params.ketixuanzeName != 'null' ">
+                and ketixuanze.ketixuanze_name like CONCAT('%',#{params.ketixuanzeName},'%')
+            </if>
+            <if test="params.ketixuanzeTypes != null  and params.ketixuanzeTypes != ''">
+                and ketixuanze.ketixuanze_types = #{params.ketixuanzeTypes}
+            </if>
+
+            <if test="params.laiyuanTypes != null  and params.laiyuanTypes != ''">
+                and ketixuanze.laiyuan_types = #{params.laiyuanTypes}
+            </if>
+
+            <if test="params.zhuanyeTypes != null  and params.zhuanyeTypes != ''">
+                and ketixuanze.zhuanye_types = #{params.zhuanyeTypes}
+            </if>
+
+            <if test="params.ketixuanzeYixuanStart != null  and params.ketixuanzeYixuanStart != '' ">
+                <![CDATA[  and ketixuanze.ketixuanze_yixuan >= #{params.ketixuanzeYixuanStart}   ]]>
+            </if>
+            <if test="params.ketixuanzeYixuanEnd != null  and params.ketixuanzeYixuanEnd != '' ">
+                <![CDATA[  and ketixuanze.ketixuanze_yixuan <= #{params.ketixuanzeYixuanEnd}   ]]>
+            </if>
+            <if test="params.ketixuanzeYixuan != null  and params.ketixuanzeYixuan != '' ">
+                and ketixuanze.ketixuanze_yixuan = #{params.ketixuanzeYixuan}
+            </if>
+            <if test="params.ketixuanzeKexuanStart != null  and params.ketixuanzeKexuanStart != '' ">
+                <![CDATA[  and ketixuanze.ketixuanze_kexuan >= #{params.ketixuanzeKexuanStart}   ]]>
+            </if>
+            <if test="params.ketixuanzeKexuanEnd != null  and params.ketixuanzeKexuanEnd != '' ">
+                <![CDATA[  and ketixuanze.ketixuanze_kexuan <= #{params.ketixuanzeKexuanEnd}   ]]>
+            </if>
+            <if test="params.ketixuanzeKexuan != null  and params.ketixuanzeKexuan != '' ">
+                and ketixuanze.ketixuanze_kexuan = #{params.ketixuanzeKexuan}
+            </if>
+            <if test=" params.ketixuanzeContent != '' and params.ketixuanzeContent != null and params.ketixuanzeContent != 'null' ">
+                and ketixuanze.ketixuanze_content like CONCAT('%',#{params.ketixuanzeContent},'%')
+            </if>
+            <if test="params.ketixuanzeYesnoTypes != null  and params.ketixuanzeYesnoTypes != ''">
+                and ketixuanze.ketixuanze_yesno_types = #{params.ketixuanzeYesnoTypes}
+            </if>
+
+            <if test=" params.ketixuanzeYesnoText != '' and params.ketixuanzeYesnoText != null and params.ketixuanzeYesnoText != 'null' ">
+                and ketixuanze.ketixuanze_yesno_text like CONCAT('%',#{params.ketixuanzeYesnoText},'%')
+            </if>
+            <if test="params.ketixuanzeDeleteStart != null  and params.ketixuanzeDeleteStart != '' ">
+                <![CDATA[  and ketixuanze.ketixuanze_delete >= #{params.ketixuanzeDeleteStart}   ]]>
+            </if>
+            <if test="params.ketixuanzeDeleteEnd != null  and params.ketixuanzeDeleteEnd != '' ">
+                <![CDATA[  and ketixuanze.ketixuanze_delete <= #{params.ketixuanzeDeleteEnd}   ]]>
+            </if>
+            <if test="params.ketixuanzeDelete != null  and params.ketixuanzeDelete != '' ">
+                and ketixuanze.ketixuanze_delete = #{params.ketixuanzeDelete}
+            </if>
+                <!-- 判断学生的id不为空 -->
+            <if test=" params.yonghuIdNotNull != '' and params.yonghuIdNotNull != null and params.yonghuIdNotNull != 'null' ">
+                and a.yonghu_id IS NOT NULL
+            </if>
+            <if test=" params.yonghuName != '' and params.yonghuName != null and params.yonghuName != 'null' ">
+                and yonghu.yonghu_name like CONCAT('%',#{params.yonghuName},'%')
+            </if>
+            <if test=" params.yonghuPhone != '' and params.yonghuPhone != null and params.yonghuPhone != 'null' ">
+                and yonghu.yonghu_phone like CONCAT('%',#{params.yonghuPhone},'%')
+            </if>
+            <if test="params.zhuanyeTypes != null  and params.zhuanyeTypes != ''">
+                and yonghu.zhuanye_types = #{params.zhuanyeTypes}
+            </if>
+
+            <if test="params.banjiTypes != null  and params.banjiTypes != ''">
+                and yonghu.banji_types = #{params.banjiTypes}
+            </if>
+
+            <if test="params.yonghuDeleteStart != null  and params.yonghuDeleteStart != '' ">
+                <![CDATA[  and yonghu.yonghu_delete >= #{params.yonghuDeleteStart}   ]]>
+            </if>
+            <if test="params.yonghuDeleteEnd != null  and params.yonghuDeleteEnd != '' ">
+                <![CDATA[  and yonghu.yonghu_delete <= #{params.yonghuDeleteEnd}   ]]>
+            </if>
+            <if test="params.yonghuDelete != null  and params.yonghuDelete != '' ">
+                and yonghu.yonghu_delete = #{params.yonghuDelete}
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(yonghu.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(yonghu.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>

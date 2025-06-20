@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.DabianshenqingDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.wodeketi_id as wodeketiId
+        ,a.dabianshenqing_types as dabianshenqingTypes
+        ,a.dabianshenqing_number as dabianshenqingNumber
+        ,a.dabianshenqing_yesno_types as dabianshenqingYesnoTypes
+        ,a.dabianshenqing_yesno_text as dabianshenqingYesnoText
+        ,a.dabianshenqing_delete as dabianshenqingDelete
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.DabianshenqingView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+        ,wodeketi.yonghu_id as wodeketiYonghuId
+        ,wodeketi.wodeketi_types as wodeketiTypes
+        ,wodeketi.wodeketi_zhidaodafen as wodeketiZhidaodafen
+        ,wodeketi.wodeketi_suijia as wodeketiSuijia
+        ,wodeketi.wodeketi_suijib as wodeketiSuijib
+        ,wodeketi.wodeketi_delete as wodeketiDelete
+
+        FROM dabianshenqing  a
+        left JOIN wodeketi wodeketi ON a.wodeketi_id = wodeketi.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.wodeketiId != null and params.wodeketiId != ''">
+                and (
+                    a.wodeketi_id = #{params.wodeketiId}
+                )
+            </if>
+            <if test="params.dabianshenqingTypes != null and params.dabianshenqingTypes != ''">
+                and a.dabianshenqing_types = #{params.dabianshenqingTypes}
+            </if>
+            <if test="params.dabianshenqingNumberStart != null and params.dabianshenqingNumberStart != ''">
+                <![CDATA[  and a.dabianshenqing_number >= #{params.dabianshenqingNumberStart}   ]]>
+            </if>
+            <if test="params.dabianshenqingNumberEnd != null and params.dabianshenqingNumberEnd != ''">
+                <![CDATA[  and a.dabianshenqing_number <= #{params.dabianshenqingNumberEnd}   ]]>
+            </if>
+             <if test="params.dabianshenqingNumber != null and params.dabianshenqingNumber != ''">
+                and a.dabianshenqing_number = #{params.dabianshenqingNumber}
+             </if>
+            <if test="params.dabianshenqingYesnoTypes != null and params.dabianshenqingYesnoTypes != ''">
+                and a.dabianshenqing_yesno_types = #{params.dabianshenqingYesnoTypes}
+            </if>
+            <if test=" params.dabianshenqingYesnoText != '' and params.dabianshenqingYesnoText != null and params.dabianshenqingYesnoText != 'null' ">
+                and a.dabianshenqing_yesno_text like CONCAT('%',#{params.dabianshenqingYesnoText},'%')
+            </if>
+            <if test="params.dabianshenqingDeleteStart != null and params.dabianshenqingDeleteStart != ''">
+                <![CDATA[  and a.dabianshenqing_delete >= #{params.dabianshenqingDeleteStart}   ]]>
+            </if>
+            <if test="params.dabianshenqingDeleteEnd != null and params.dabianshenqingDeleteEnd != ''">
+                <![CDATA[  and a.dabianshenqing_delete <= #{params.dabianshenqingDeleteEnd}   ]]>
+            </if>
+             <if test="params.dabianshenqingDelete != null and params.dabianshenqingDelete != ''">
+                and a.dabianshenqing_delete = #{params.dabianshenqingDelete}
+             </if>
+
+                <!-- 判断我的课题的id不为空 -->
+            <if test=" params.wodeketiIdNotNull != '' and params.wodeketiIdNotNull != null and params.wodeketiIdNotNull != 'null' ">
+                and a.wodeketi_id IS NOT NULL
+            </if>
+            <if test="params.yonghuId != null  and params.yonghuId != ''">
+                and wodeketi.yonghu_id = #{params.yonghuId}
+            </if>
+            <if test="params.ketixuanzeId != null  and params.ketixuanzeId != ''">
+                and wodeketi.ketixuanze_id = #{params.ketixuanzeId}
+            </if>
+            <if test="params.wodeketiTypes != null  and params.wodeketiTypes != ''">
+                and wodeketi.wodeketi_types = #{params.wodeketiTypes}
+            </if>
+
+            <if test="params.wodeketiZhidaodafenStart != null  and params.wodeketiZhidaodafenStart != '' ">
+                <![CDATA[  and wodeketi.wodeketi_zhidaodafen >= #{params.wodeketiZhidaodafenStart}   ]]>
+            </if>
+            <if test="params.wodeketiZhidaodafenEnd != null  and params.wodeketiZhidaodafenEnd != '' ">
+                <![CDATA[  and wodeketi.wodeketi_zhidaodafen <= #{params.wodeketiZhidaodafenEnd}   ]]>
+            </if>
+            <if test="params.wodeketiZhidaodafen != null  and params.wodeketiZhidaodafen != '' ">
+                and wodeketi.wodeketi_zhidaodafen = #{params.wodeketiZhidaodafen}
+            </if>
+            <if test="params.wodeketiSuijiaStart != null  and params.wodeketiSuijiaStart != '' ">
+                <![CDATA[  and wodeketi.wodeketi_suijia >= #{params.wodeketiSuijiaStart}   ]]>
+            </if>
+            <if test="params.wodeketiSuijiaEnd != null  and params.wodeketiSuijiaEnd != '' ">
+                <![CDATA[  and wodeketi.wodeketi_suijia <= #{params.wodeketiSuijiaEnd}   ]]>
+            </if>
+            <if test="params.wodeketiSuijia != null  and params.wodeketiSuijia != '' ">
+                and wodeketi.wodeketi_suijia = #{params.wodeketiSuijia}
+            </if>
+            <if test="params.wodeketiSuijibStart != null  and params.wodeketiSuijibStart != '' ">
+                <![CDATA[  and wodeketi.wodeketi_suijib >= #{params.wodeketiSuijibStart}   ]]>
+            </if>
+            <if test="params.wodeketiSuijibEnd != null  and params.wodeketiSuijibEnd != '' ">
+                <![CDATA[  and wodeketi.wodeketi_suijib <= #{params.wodeketiSuijibEnd}   ]]>
+            </if>
+            <if test="params.wodeketiSuijib != null  and params.wodeketiSuijib != '' ">
+                and wodeketi.wodeketi_suijib = #{params.wodeketiSuijib}
+            </if>
+            <if test="params.wodeketiDeleteStart != null  and params.wodeketiDeleteStart != '' ">
+                <![CDATA[  and wodeketi.wodeketi_delete >= #{params.wodeketiDeleteStart}   ]]>
+            </if>
+            <if test="params.wodeketiDeleteEnd != null  and params.wodeketiDeleteEnd != '' ">
+                <![CDATA[  and wodeketi.wodeketi_delete <= #{params.wodeketiDeleteEnd}   ]]>
+            </if>
+            <if test="params.wodeketiDelete != null  and params.wodeketiDelete != '' ">
+                and wodeketi.wodeketi_delete = #{params.wodeketiDelete}
+            </if>
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>

@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.KetixuanzeDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.jiaoshi_id as jiaoshiId
+        ,a.ketixuanze_name as ketixuanzeName
+        ,a.ketixuanze_types as ketixuanzeTypes
+        ,a.laiyuan_types as laiyuanTypes
+        ,a.zhuanye_types as zhuanyeTypes
+        ,a.ketixuanze_yixuan as ketixuanzeYixuan
+        ,a.ketixuanze_kexuan as ketixuanzeKexuan
+        ,a.ketixuanze_content as ketixuanzeContent
+        ,a.ketixuanze_yesno_types as ketixuanzeYesnoTypes
+        ,a.ketixuanze_yesno_text as ketixuanzeYesnoText
+        ,a.ketixuanze_delete as ketixuanzeDelete
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.KetixuanzeView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+        ,jiaoshi.jiaoshi_name as jiaoshiName
+        ,jiaoshi.jiaoshi_photo as jiaoshiPhoto
+        ,jiaoshi.jiaoshi_phone as jiaoshiPhone
+        ,jiaoshi.jiaoshi_delete as jiaoshiDelete
+
+        FROM ketixuanze  a
+        left JOIN jiaoshi jiaoshi ON a.jiaoshi_id = jiaoshi.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.jiaoshiId != null and params.jiaoshiId != ''">
+                and (
+                    a.jiaoshi_id = #{params.jiaoshiId}
+                )
+            </if>
+            <if test=" params.ketixuanzeName != '' and params.ketixuanzeName != null and params.ketixuanzeName != 'null' ">
+                and a.ketixuanze_name like CONCAT('%',#{params.ketixuanzeName},'%')
+            </if>
+            <if test="params.ketixuanzeTypes != null and params.ketixuanzeTypes != ''">
+                and a.ketixuanze_types = #{params.ketixuanzeTypes}
+            </if>
+            <if test="params.laiyuanTypes != null and params.laiyuanTypes != ''">
+                and a.laiyuan_types = #{params.laiyuanTypes}
+            </if>
+            <if test="params.zhuanyeTypes != null and params.zhuanyeTypes != ''">
+                and a.zhuanye_types = #{params.zhuanyeTypes}
+            </if>
+            <if test="params.ketixuanzeYixuanStart != null and params.ketixuanzeYixuanStart != ''">
+                <![CDATA[  and a.ketixuanze_yixuan >= #{params.ketixuanzeYixuanStart}   ]]>
+            </if>
+            <if test="params.ketixuanzeYixuanEnd != null and params.ketixuanzeYixuanEnd != ''">
+                <![CDATA[  and a.ketixuanze_yixuan <= #{params.ketixuanzeYixuanEnd}   ]]>
+            </if>
+             <if test="params.ketixuanzeYixuan != null and params.ketixuanzeYixuan != ''">
+                and a.ketixuanze_yixuan = #{params.ketixuanzeYixuan}
+             </if>
+            <if test="params.ketixuanzeKexuanStart != null and params.ketixuanzeKexuanStart != ''">
+                <![CDATA[  and a.ketixuanze_kexuan >= #{params.ketixuanzeKexuanStart}   ]]>
+            </if>
+            <if test="params.ketixuanzeKexuanEnd != null and params.ketixuanzeKexuanEnd != ''">
+                <![CDATA[  and a.ketixuanze_kexuan <= #{params.ketixuanzeKexuanEnd}   ]]>
+            </if>
+             <if test="params.ketixuanzeKexuan != null and params.ketixuanzeKexuan != ''">
+                and a.ketixuanze_kexuan = #{params.ketixuanzeKexuan}
+             </if>
+            <if test=" params.ketixuanzeContent != '' and params.ketixuanzeContent != null and params.ketixuanzeContent != 'null' ">
+                and a.ketixuanze_content like CONCAT('%',#{params.ketixuanzeContent},'%')
+            </if>
+            <if test="params.ketixuanzeYesnoTypes != null and params.ketixuanzeYesnoTypes != ''">
+                and a.ketixuanze_yesno_types = #{params.ketixuanzeYesnoTypes}
+            </if>
+            <if test=" params.ketixuanzeYesnoText != '' and params.ketixuanzeYesnoText != null and params.ketixuanzeYesnoText != 'null' ">
+                and a.ketixuanze_yesno_text like CONCAT('%',#{params.ketixuanzeYesnoText},'%')
+            </if>
+            <if test="params.ketixuanzeDeleteStart != null and params.ketixuanzeDeleteStart != ''">
+                <![CDATA[  and a.ketixuanze_delete >= #{params.ketixuanzeDeleteStart}   ]]>
+            </if>
+            <if test="params.ketixuanzeDeleteEnd != null and params.ketixuanzeDeleteEnd != ''">
+                <![CDATA[  and a.ketixuanze_delete <= #{params.ketixuanzeDeleteEnd}   ]]>
+            </if>
+             <if test="params.ketixuanzeDelete != null and params.ketixuanzeDelete != ''">
+                and a.ketixuanze_delete = #{params.ketixuanzeDelete}
+             </if>
+
+                <!-- 判断教师的id不为空 -->
+            <if test=" params.jiaoshiIdNotNull != '' and params.jiaoshiIdNotNull != null and params.jiaoshiIdNotNull != 'null' ">
+                and a.jiaoshi_id IS NOT NULL
+            </if>
+            <if test=" params.jiaoshiName != '' and params.jiaoshiName != null and params.jiaoshiName != 'null' ">
+                and jiaoshi.jiaoshi_name like CONCAT('%',#{params.jiaoshiName},'%')
+            </if>
+            <if test=" params.jiaoshiPhone != '' and params.jiaoshiPhone != null and params.jiaoshiPhone != 'null' ">
+                and jiaoshi.jiaoshi_phone like CONCAT('%',#{params.jiaoshiPhone},'%')
+            </if>
+            <if test="params.jiaoshiDeleteStart != null  and params.jiaoshiDeleteStart != '' ">
+                <![CDATA[  and jiaoshi.jiaoshi_delete >= #{params.jiaoshiDeleteStart}   ]]>
+            </if>
+            <if test="params.jiaoshiDeleteEnd != null  and params.jiaoshiDeleteEnd != '' ">
+                <![CDATA[  and jiaoshi.jiaoshi_delete <= #{params.jiaoshiDeleteEnd}   ]]>
+            </if>
+            <if test="params.jiaoshiDelete != null  and params.jiaoshiDelete != '' ">
+                and jiaoshi.jiaoshi_delete = #{params.jiaoshiDelete}
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(jiaoshi.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(jiaoshi.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>

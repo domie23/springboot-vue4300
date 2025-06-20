@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.DafenzhongxinDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.jiaoshi_id as jiaoshiId
+        ,a.wodeketi_id as wodeketiId
+        ,a.dafenzhongxin_sum as dafenzhongxinSum
+        ,a.dafenzhongxin_delete as dafenzhongxinDelete
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.DafenzhongxinView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+        ,wodeketi.yonghu_id as wodeketiYonghuId
+        ,wodeketi.wodeketi_types as wodeketiTypes
+        ,wodeketi.wodeketi_zhidaodafen as wodeketiZhidaodafen
+        ,wodeketi.wodeketi_suijia as wodeketiSuijia
+        ,wodeketi.wodeketi_suijib as wodeketiSuijib
+        ,wodeketi.wodeketi_delete as wodeketiDelete
+        ,jiaoshi.jiaoshi_name as jiaoshiName
+        ,jiaoshi.jiaoshi_photo as jiaoshiPhoto
+        ,jiaoshi.jiaoshi_phone as jiaoshiPhone
+        ,jiaoshi.jiaoshi_delete as jiaoshiDelete
+
+        FROM dafenzhongxin  a
+        left JOIN wodeketi wodeketi ON a.wodeketi_id = wodeketi.id
+        left JOIN jiaoshi jiaoshi ON a.jiaoshi_id = jiaoshi.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.jiaoshiId != null and params.jiaoshiId != ''">
+                and (
+                    a.jiaoshi_id = #{params.jiaoshiId}
+                )
+            </if>
+            <if test="params.wodeketiId != null and params.wodeketiId != ''">
+                and (
+                    a.wodeketi_id = #{params.wodeketiId}
+                )
+            </if>
+            <if test="params.dafenzhongxinSumStart != null and params.dafenzhongxinSumStart != ''">
+                <![CDATA[  and a.dafenzhongxin_sum >= #{params.dafenzhongxinSumStart}   ]]>
+            </if>
+            <if test="params.dafenzhongxinSumEnd != null and params.dafenzhongxinSumEnd != ''">
+                <![CDATA[  and a.dafenzhongxin_sum <= #{params.dafenzhongxinSumEnd}   ]]>
+            </if>
+             <if test="params.dafenzhongxinSum != null and params.dafenzhongxinSum != ''">
+                and a.dafenzhongxin_sum = #{params.dafenzhongxinSum}
+             </if>
+            <if test="params.dafenzhongxinDeleteStart != null and params.dafenzhongxinDeleteStart != ''">
+                <![CDATA[  and a.dafenzhongxin_delete >= #{params.dafenzhongxinDeleteStart}   ]]>
+            </if>
+            <if test="params.dafenzhongxinDeleteEnd != null and params.dafenzhongxinDeleteEnd != ''">
+                <![CDATA[  and a.dafenzhongxin_delete <= #{params.dafenzhongxinDeleteEnd}   ]]>
+            </if>
+             <if test="params.dafenzhongxinDelete != null and params.dafenzhongxinDelete != ''">
+                and a.dafenzhongxin_delete = #{params.dafenzhongxinDelete}
+             </if>
+
+                <!-- 判断我的课题的id不为空 -->
+            <if test=" params.wodeketiIdNotNull != '' and params.wodeketiIdNotNull != null and params.wodeketiIdNotNull != 'null' ">
+                and a.wodeketi_id IS NOT NULL
+            </if>
+            <if test="params.yonghuId != null  and params.yonghuId != ''">
+                and wodeketi.yonghu_id = #{params.yonghuId}
+            </if>
+            <if test="params.ketixuanzeId != null  and params.ketixuanzeId != ''">
+                and wodeketi.ketixuanze_id = #{params.ketixuanzeId}
+            </if>
+            <if test="params.wodeketiTypes != null  and params.wodeketiTypes != ''">
+                and wodeketi.wodeketi_types = #{params.wodeketiTypes}
+            </if>
+
+            <if test="params.wodeketiZhidaodafenStart != null  and params.wodeketiZhidaodafenStart != '' ">
+                <![CDATA[  and wodeketi.wodeketi_zhidaodafen >= #{params.wodeketiZhidaodafenStart}   ]]>
+            </if>
+            <if test="params.wodeketiZhidaodafenEnd != null  and params.wodeketiZhidaodafenEnd != '' ">
+                <![CDATA[  and wodeketi.wodeketi_zhidaodafen <= #{params.wodeketiZhidaodafenEnd}   ]]>
+            </if>
+            <if test="params.wodeketiZhidaodafen != null  and params.wodeketiZhidaodafen != '' ">
+                and wodeketi.wodeketi_zhidaodafen = #{params.wodeketiZhidaodafen}
+            </if>
+            <if test="params.wodeketiSuijiaStart != null  and params.wodeketiSuijiaStart != '' ">
+                <![CDATA[  and wodeketi.wodeketi_suijia >= #{params.wodeketiSuijiaStart}   ]]>
+            </if>
+            <if test="params.wodeketiSuijiaEnd != null  and params.wodeketiSuijiaEnd != '' ">
+                <![CDATA[  and wodeketi.wodeketi_suijia <= #{params.wodeketiSuijiaEnd}   ]]>
+            </if>
+            <if test="params.wodeketiSuijia != null  and params.wodeketiSuijia != '' ">
+                and wodeketi.wodeketi_suijia = #{params.wodeketiSuijia}
+            </if>
+            <if test="params.wodeketiSuijibStart != null  and params.wodeketiSuijibStart != '' ">
+                <![CDATA[  and wodeketi.wodeketi_suijib >= #{params.wodeketiSuijibStart}   ]]>
+            </if>
+            <if test="params.wodeketiSuijibEnd != null  and params.wodeketiSuijibEnd != '' ">
+                <![CDATA[  and wodeketi.wodeketi_suijib <= #{params.wodeketiSuijibEnd}   ]]>
+            </if>
+            <if test="params.wodeketiSuijib != null  and params.wodeketiSuijib != '' ">
+                and wodeketi.wodeketi_suijib = #{params.wodeketiSuijib}
+            </if>
+            <if test="params.wodeketiDeleteStart != null  and params.wodeketiDeleteStart != '' ">
+                <![CDATA[  and wodeketi.wodeketi_delete >= #{params.wodeketiDeleteStart}   ]]>
+            </if>
+            <if test="params.wodeketiDeleteEnd != null  and params.wodeketiDeleteEnd != '' ">
+                <![CDATA[  and wodeketi.wodeketi_delete <= #{params.wodeketiDeleteEnd}   ]]>
+            </if>
+            <if test="params.wodeketiDelete != null  and params.wodeketiDelete != '' ">
+                and wodeketi.wodeketi_delete = #{params.wodeketiDelete}
+            </if>
+                <!-- 判断教师的id不为空 -->
+            <if test=" params.jiaoshiIdNotNull != '' and params.jiaoshiIdNotNull != null and params.jiaoshiIdNotNull != 'null' ">
+                and a.jiaoshi_id IS NOT NULL
+            </if>
+            <if test=" params.jiaoshiName != '' and params.jiaoshiName != null and params.jiaoshiName != 'null' ">
+                and jiaoshi.jiaoshi_name like CONCAT('%',#{params.jiaoshiName},'%')
+            </if>
+            <if test=" params.jiaoshiPhone != '' and params.jiaoshiPhone != null and params.jiaoshiPhone != 'null' ">
+                and jiaoshi.jiaoshi_phone like CONCAT('%',#{params.jiaoshiPhone},'%')
+            </if>
+            <if test="params.jiaoshiDeleteStart != null  and params.jiaoshiDeleteStart != '' ">
+                <![CDATA[  and jiaoshi.jiaoshi_delete >= #{params.jiaoshiDeleteStart}   ]]>
+            </if>
+            <if test="params.jiaoshiDeleteEnd != null  and params.jiaoshiDeleteEnd != '' ">
+                <![CDATA[  and jiaoshi.jiaoshi_delete <= #{params.jiaoshiDeleteEnd}   ]]>
+            </if>
+            <if test="params.jiaoshiDelete != null  and params.jiaoshiDelete != '' ">
+                and jiaoshi.jiaoshi_delete = #{params.jiaoshiDelete}
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(jiaoshi.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(jiaoshi.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>
